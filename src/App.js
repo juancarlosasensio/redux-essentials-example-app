@@ -6,6 +6,8 @@ import {
   Redirect,
 } from 'react-router-dom'
 
+import PostsList from './features/posts/PostsList'
+import AddPostForm from './features/posts/AddPostForm'
 import { Navbar } from './app/Navbar'
 
 function App() {
@@ -18,9 +20,10 @@ function App() {
             exact
             path="/"
             render={() => (
-              <section>
-                <h2>Welcome to the Redux Essentials example app!</h2>
-              </section>
+              <>
+                <AddPostForm />
+                <PostsList />
+              </>
             )}
           />
           <Redirect to="/" />
