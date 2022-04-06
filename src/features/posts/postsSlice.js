@@ -1,8 +1,21 @@
 import {createSlice, nanoid} from '@reduxjs/toolkit';
+import { sub } from 'date-fns';
 
 const initialState = [
-  { id: '1', title: 'First Post!', content: 'Hello!' },
-  { id: '2', title: 'Second Post', content: 'More text' }
+  { 
+    id: '1', 
+    title: 'First Post!', 
+    content: 'Hello!', 
+    date: sub(new Date(), {minutes: 10}).toISOString(),
+    reactions: {thumbsUp: 0, hooray: 0}
+  },
+  { 
+    id: '2', 
+    title: 'Second Post', 
+    content: 'More text',
+    date: sub(new Date(), { minutes: 5 }).toISOString(),
+    reactions: {thumbsUp: 4, hooray: 1, rocket: 2}
+  }
 ]
 
 
@@ -25,13 +38,15 @@ const postsSlice = createSlice({
       Previously,  we'd have to duplicate that logic every time we wanted to 
       dispatch the action, calling it like dispatch(postAdded({id: nanoid(), title, content})), 
       forcing the component to know exactly what the payload for this action should look like. */
-      prepare(title, content, userId) {
+      prepare(title, content, userId, reactions) {
         return {
           payload: {
             id: nanoid(),
+            date: new Date().toISOString(),
             title, 
             content,
-            user: userId
+            user: userId,
+            reactions
           }
         }
       }
@@ -43,12 +58,25 @@ const postsSlice = createSlice({
         existingPost.title = title;
         existingPost.content = content;
       }
+    },
+    // Action objects should contain the minimum amount of info needed to describe what happened. We know which post we need to update, and which reaction name was clicked on. We could have calculated the new reaction counter value and put that in the action, but it's always better to keep the action objects as small as possible, and do the state update calculations in the reducer. This also means that reducers can contain as much logic as necessary to calculate the new state.
+    reactionAdded: (state, action) => {
+      const {postId, reaction} = action.payload;
+      const existingPost = state.find(post => post.id === postId);
+
+      if (existingPost) {
+        if (existingPost.reactions[reaction]) {
+          existingPost.reactions[reaction]++
+        } else {
+          existingPost.reactions[reaction] = 1  
+        }
+      }
     }
   }  
 });
 
 //Q: Why is this exporting an action and not a reducer?
 //A: createSlice provides action creators behind the scene. Here, we export the action creator, which is what we can then "dispatch" from our React components.
-export const { postAdded, postUpdated } = postsSlice.actions
+export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions
 
 export default postsSlice.reducer
