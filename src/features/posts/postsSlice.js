@@ -80,3 +80,8 @@ const postsSlice = createSlice({
 export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions
 
 export default postsSlice.reducer
+
+//The reusable selector functions below allow components to use those selectors to extract the data they need instead of repeating the selector logic in each component. That way, if we do change our state structure again, we only need to update the code in the slice file.
+
+export const selectAllPosts = (state) => state.posts;
+export const selectPostById = (state, postId) => state.posts.find(post => post.id === postId);
