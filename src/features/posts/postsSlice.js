@@ -54,7 +54,7 @@ const postsSlice = createSlice({
       const existingPost = state.posts.find(post => post.id === postId);
 
       if (existingPost) {
-        if (existingPost.reactions[reaction]) {
+        if (existingPost.reactions[reaction] !== 0) {
           existingPost.reactions[reaction]++
         } else {
           existingPost.reactions[reaction] = 1  
