@@ -32,6 +32,7 @@ export const PostsList = () => {
   const postStatus = useSelector(state => state.posts.status)
   const error = useSelector(state => state.posts.error)
 
+  //Still don't understand this code...when do we want to fetch new posts?
   useEffect(() => {
     if (postStatus === 'idle') {
       dispatch(fetchPosts())
