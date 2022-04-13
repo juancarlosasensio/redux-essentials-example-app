@@ -18,28 +18,6 @@ const postsSlice = createSlice({
   name: 'posts',
   initialState,
   reducers: {
-    postAdded: {
-      reducer(state, action) {
-        state.posts.push(action.payload);
-      },
-      /* We're using the "prepare" callback here in case we needed to dispatch the same action from different components, 
-      or the logic for preparing the payload is complicated.
-      Previously,  we'd have to duplicate that logic every time we wanted to 
-      dispatch the action, calling it like dispatch(postAdded({id: nanoid(), title, content})), 
-      forcing the component to know exactly what the payload for this action should look like. */
-      prepare(title, content, userId, reactions) {
-        return {
-          payload: {
-            id: nanoid(),
-            date: new Date().toISOString(),
-            title, 
-            content,
-            user: userId,
-            reactions
-          }
-        }
-      }
-  },
     postUpdated: (state, action) => {
       const {title, content, id} = action.payload;
       const existingPost = state.posts.find(post => post.id === id);
@@ -78,12 +56,15 @@ const postsSlice = createSlice({
       state.status = "failed";
       state.error = action.error.message
     })
+    .addCase(addNewPost.fulfilled, (state, action) => {
+      state.posts.push(action.payload);
+    })
   }
 });
 
 //Q: Why is this exporting an action and not a reducer?
 //A: createSlice provides action creators behind the scenes. Here, we export the action creator, which is what we can then "dispatch" from our React components.
-export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions
+export const { postUpdated, reactionAdded } = postsSlice.actions
 
 export default postsSlice.reducer
 
@@ -93,6 +74,18 @@ export const fetchPosts = createAsyncThunk('posts/fetchPosts', async () => {
   const response = await client.get('/fakeApi/posts')
   return response.data
 })
+
+// addNewPost that saves to the database and uses server's response to update state
+export const addNewPost = createAsyncThunk(
+  'posts/addNewPost',
+  // The payload creator receives the partial `{title, content, user}` object
+  async initialPost => {
+    // We send the initial data to the fake API server
+    const response = await client.post('/fakeApi/posts', initialPost)
+    // The response includes the complete post object, including unique ID
+    return response.data
+  }
+)
 
 //The reusable selector functions below allow components to use those selectors to extract the data they need instead of repeating the selector logic in each component. That way, if we do change our state structure again, we only need to update the code in the slice file.
 

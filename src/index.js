@@ -13,8 +13,9 @@ async function start() {
   // Start our mock API server
   await worker.start({ onUnhandledRequest: 'bypass' })
   
+  // We only need to fetch the list of users once, and we want to do it right when the application starts. We can do that in our index.js file, and directly dispatch the fetchUsers thunk because we have the store right there
   store.dispatch(fetchUsers());
-  
+
   ReactDOM.render(
     <React.StrictMode>
       <Provider store={store}>
