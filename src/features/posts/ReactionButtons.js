@@ -17,6 +17,8 @@ export const ReactionButtons = ({ post }) => {
   //Docs: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
   // Clean use of destructuring the array of args in the map func
   const reactionButtons = Object.entries(reactionEmoji).map(([name, emoji]) => {
+    //Because, when creating a new post, reactions will be undefined...
+    const reactionCounter = post.reactions ? post.reactions[name] : 0
     return (
       <button 
         key={name} 
@@ -27,7 +29,7 @@ export const ReactionButtons = ({ post }) => {
           dispatch(reactionAdded({postId: post.id, reaction: name}))
         }
       >
-        {emoji} {post.reactions[name]}
+        {emoji} {reactionCounter}
       </button>
     )
   })
