@@ -44,8 +44,8 @@ const postsSlice = createSlice({
 
   // The extraReducers option should be a function that receives a parameter called builder. The builder object provides methods that let us define additional case reducers that will run in response to actions defined outside of the slice
   extraReducers(builder) {
-    builder.
-    addCase(fetchPosts.pending, (state, action) => {
+    builder
+    .addCase(fetchPosts.pending, (state, action) => {
       state.status = "loading";
     })
     .addCase(fetchPosts.fulfilled, (state, action) => {
